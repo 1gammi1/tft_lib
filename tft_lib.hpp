@@ -30,6 +30,8 @@ public:
                 spi_rst(spi_rst_funx), wait(dellay_funx)   {}
 
     void init();
+    void txByte(uint8_t data);
+    void txWindow(uint16_t )
 
     enum class CMD: uint8_t{
         RESET_SW = 0,
