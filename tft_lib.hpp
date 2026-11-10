@@ -31,16 +31,19 @@ public:
 
     void init();
     void txByte(uint8_t data);
-    void txWindow(uint16_t )
+    void txWindow(uint16_t );
 
     enum class CMD: uint8_t{
         RESET_SW = 0,
+    //команды инициализации 
+        SET_PIXEL_FORMAT,   //3bit - 0x01, 16bit - 0x05, 18bit - 0x06
+        FPS,                //установка фпс
+
+    //команды вывода
         COL_ADR,            //адрес столбца
         LINE_ADR,           //адрес строки
         WINDOW_WRITE,       //Запись в окно с начала
         CONT_WINDOW_WRITE,  //Продолжить запись без сброса адреса.
-
-        FPS,                //установка фпс
 
     //чтение с дисплея
         READ_ID4,
@@ -82,23 +85,65 @@ private:
         uint8_t par2;
     };
 
+//*Переменные
+    CMD curCMD = CMD::CNT;
+    uint8_t txCMD = 0;
+    uint8_t txbuff[sizeof(TxData_t)] = {0};
+    uint8_t rxbuff[sizeof(uint16_t)] = {0};
+
 //* сервесные методы
+    MAJOR_STATE m_main(uint32_t period_ms);
+    MAJOR_STATE m_transmit();
+    MAJOR_STATE m_recieve();
+    MAJOR_STATE m_disconnect();
+    MAJOR_STATE m_process_communicate(uint32_t period_ms);
     void setCmd(uint16_t cmd);
+
 
 //* КОНСТАНТЫ
     const uint16_t MAX_COL_ADR = 319;
     const uint16_t MAX_LINE_ADR = 479;
-
 static constexpr uint8_t   COMMANDS[uint8_t(CMD::CNT)] = {
         [uint8_t(CMD::RESET_SW)] = 0x01,
+        [uint8_t(CMD::SET_PIXEL_FORMAT)] = 0x3A,    // 121 стр
+        [uint8_t(CMD::FPS)] = 0xB1,                 //описание на 221 стр
         [uint8_t(CMD::COL_ADR)] = 0x2A,
         [uint8_t(CMD::LINE_ADR)] = 0x2B,
         [uint8_t(CMD::WINDOW_WRITE)] = 0x2C,
         [uint8_t(CMD::CONT_WINDOW_WRITE)] = 0x3C,
-        [uint8_t(CMD::FPS)] = 0xB1,                 //описание на 221 стр
         [uint8_t(CMD::READ_ID4)] = 0x3D,
         [uint8_t(CMD::READ_DISP_ID)] = 0x04,
     };
+    enum class COLOR_8b : uint8_t{
+        BLACK = 0,
+        RED,
+        GREEN,
+        BLUE,
+        YELLOW,
+        CYAN,       //голубой
+        MAGENTA,     //розовый
+        WHITE,
+
+        CNT
+    };
+
+    struct __attribute__((packed)) COLOR_PAC_8B{
+        uint8_t r :1 = 0;
+        uint8_t g :1 = 0;
+        uint8_t b :1 = 0;
+    };
+
+    static constexpr COLOR_PAC_8B COLORS_8B_PAR[uint8_t(COLOR_8b::CNT)] = {
+        [uint8_t(COLOR_8b::BLACK)] = {0,0,0},
+        [uint8_t(COLOR_8b::RED)] = {1,0,0},
+        [uint8_t(COLOR_8b::GREEN)] = {0,1,0},
+        [uint8_t(COLOR_8b::BLUE)] = {0,0,1},
+        [uint8_t(COLOR_8b::YELLOW)] = {1,1,0},
+        [uint8_t(COLOR_8b::CYAN)] = {0,1,1},
+        [uint8_t(COLOR_8b::MAGENTA)] = {1,0,1},
+        [uint8_t(COLOR_8b::WHITE)] = {1,1,1},
+    };
+
     
     uint8_t(* const spi_transmit)(const uint8_t addr, const uint8_t* data, 
                                   uint16_t size) = nullptr;
