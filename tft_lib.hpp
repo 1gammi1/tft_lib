@@ -29,7 +29,7 @@ public:
                 spi_led(set_led_funx), spi_dc(set_DC_funx), tft_rst(set_reset_funx),
                 spi_rst(spi_rst_funx), wait(dellay_funx)   {}
 
-    void init();
+    bool init();
     void txByte(uint8_t data);
     void txWindow(uint16_t );
 
@@ -53,31 +53,16 @@ public:
         CNT
     };
 private:
-    enum class MAJOR_STATE : uint8_t {
-        MAIN = 1,
+    enum class FSM_STATE : uint8_t {
+        INIT = 0,
+        IDLE,
         TRANSMIT,
-        RECIEVE,
         PROCESS_COMMUNICATE,
         DISCONNECT,
 
         CNT
     };
 
-    enum class MINOR_STATE : uint8_t {
-        INIT = 0,
-        DEFOULT,
-        
-        
-        CNT
-    };
-
-    enum class DISCONNECT_STATE : uint8_t {
-        LOST_CONNECT = 0,
-        CHECK,
-        CONNECTED,
-
-        CNT
-    };
 
     struct __attribute__((packed)) TxData_t{
         uint8_t cmd;
@@ -86,19 +71,18 @@ private:
     };
 
 //*Переменные
-    CMD curCMD = CMD::CNT;
-    uint8_t txCMD = 0;
+    CMD actualcmd = CMD::CNT;//?rm
+    CMD txcmd = CMD::CNT;
+
     uint8_t txbuff[sizeof(TxData_t)] = {0};
     uint8_t rxbuff[sizeof(uint16_t)] = {0};
 
-//* сервесные методы
-    MAJOR_STATE m_main(uint32_t period_ms);
-    MAJOR_STATE m_transmit();
-    MAJOR_STATE m_recieve();
-    MAJOR_STATE m_disconnect();
-    MAJOR_STATE m_process_communicate(uint32_t period_ms);
-    void setCmd(uint16_t cmd);
+    uint32_t ts_ms = 0;
+    uint16_t txsize = 0;
 
+//* сервесные методы
+
+    void setCMD(CMD cmd);
 
 //* КОНСТАНТЫ
     const uint16_t MAX_COL_ADR = 319;
