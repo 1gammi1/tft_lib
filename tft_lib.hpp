@@ -4,6 +4,31 @@
 #include <cstdint>
 #include <endian.h>
 
+enum class DC_MODE_t : uint8_t{
+        CMD = 0,
+        PARAMS,
+        DATA = uint8_t(PARAMS)
+    };
+
+enum class COLOR_3B_t : uint8_t{
+        BLACK = 0,
+        RED,
+        GREEN,
+        BLUE,
+        YELLOW,
+        CYAN,       //голубой
+        MAGENTA,     //розовый
+        WHITE,
+
+        CNT
+    };
+
+struct __attribute__((packed)) COLOR_PAC_3B_t{
+    uint8_t r :1 = 0;
+    uint8_t g :1 = 0;
+    uint8_t b :1 = 0;
+    
+};
 
 class TFT_ILI9488{
 public:
@@ -12,15 +37,16 @@ public:
     TFT_ILI9488(uint8_t(*spi_tx_funx)( const uint8_t*, uint16_t),
                 uint8_t(*spi_rx_funx)(const uint8_t, uint8_t*, uint16_t), 
                 void(*select_disp_funx) (const bool), void(*set_led_funx) (const bool),
-                void(*set_DC_funx) (const bool), void(*set_reset_funx) (const bool), 
+                void(*set_DC_funx) (const DC_MODE_t), void(*set_reset_funx) (const bool), 
                 void(*spi_rst_funx) (), void(*dellay_funx)(uint32_t)):
-                spi_transmit(spi_tx_funx), spi_receive(spi_rx_funx), spi_cs(select_disp_funx),
-                spi_led(set_led_funx), spi_dc(set_DC_funx), tft_rst(set_reset_funx),
+                spi_transmit(spi_tx_funx), spi_receive(spi_rx_funx), tft_cs(select_disp_funx),
+                tft_led(set_led_funx), tft_dc(set_DC_funx), tft_rst(set_reset_funx),
                 spi_rst(spi_rst_funx), wait(dellay_funx)   {}
 
-    bool init();
-    void txByte(uint8_t data);
-    void txWindow(uint16_t );
+    ///@brief инициализация дисплея
+    void TFT_Init();
+    // заливка цветом
+    void TFT_FillScreen(const COLOR_PAC_3B_t color_pac);
 
     enum class CMD: uint8_t{
         RESET_SW = 0,
@@ -41,6 +67,11 @@ public:
 
         CNT
     };
+
+    
+
+
+
 private:
     enum class FSM_STATE : uint8_t {
         INIT = 0,
@@ -77,25 +108,7 @@ static constexpr uint8_t   COMMANDS[uint8_t(CMD::CNT)] = {
         [uint8_t(CMD::READ_ID4)] = 0x3D,
         [uint8_t(CMD::READ_DISP_ID)] = 0x04,
     };
-    enum class COLOR_3B_t : uint8_t{
-        BLACK = 0,
-        RED,
-        GREEN,
-        BLUE,
-        YELLOW,
-        CYAN,       //голубой
-        MAGENTA,     //розовый
-        WHITE,
-
-        CNT
-    };
-
-    struct __attribute__((packed)) COLOR_PAC_3B_t{
-        uint8_t r :1 = 0;
-        uint8_t g :1 = 0;
-        uint8_t b :1 = 0;
-        
-    };
+    
 
     
 
@@ -115,22 +128,35 @@ static constexpr uint8_t   COMMANDS[uint8_t(CMD::CNT)] = {
                                   uint16_t size) = nullptr;
     uint8_t(* const spi_receive)(const uint8_t addr, uint8_t* data, 
                                  uint16_t size) = nullptr;
-    void(* const spi_cs)(const bool state) = nullptr;   //0 - выбран, 1 - откл
-    void(* const spi_led)(const bool state) = nullptr;  //0-выкл, 1-вкл
-    void(* const spi_dc)(const bool state) = nullptr;   //передача 0-команды, 1- параметра или данных
+    void(* const tft_cs)(const bool state) = nullptr;   //0 - выбран, 1 - откл
+    void(* const tft_led)(const bool state) = nullptr;  //0-выкл, 1-вкл
+    void(* const tft_dc)(const DC_MODE_t state) = nullptr;   //передача 0-команды, 1- параметра или данных
     void(* const spi_rst)() = nullptr;  //? хз
     void(* const tft_rst)(const bool state) = nullptr;  //? хз
     void(* const wait)(uint32_t t_ms) = nullptr;
 
 //* КОНСТАНТЫ
-    static constexpr uint16_t MAX_COL_ADR = 319;
-    static constexpr uint16_t MAX_LINE_ADR = 479;
+    static constexpr uint16_t MAX_LINE_ADR = 319;
+    static constexpr uint16_t MAX_COL_ADR = 479;
     static constexpr uint8_t ACTIVE_WIND_WEIGH = 255;
     static constexpr uint8_t ACTIVE_WIND_HEIGH = 169;
 
     //* сервисные методы
-    void sendWindow(WindCoordinates coordinate, COLOR_PAC_3B_t (*pixels_buf)[(coordinate.x1 - coordinate.x0) * (coordinate.y1 - coordinate.y0)]);
-    void setCMD(CMD cmd);
+    ///@brief отправка одной команды
+    void TFT_WriteCommand(const uint8_t cmd);
+
+    ///@brief отправкамассива данных
+    void TFT_WriteData(uint8_t *data, uint16_t size);
+
+    ///@brief перезапуск дисплея
+    void TFT_Reset();
+
+    // Установка области рисования
+    void TFT_SetAddressWindow(const uint16_t x0, const uint16_t y0, const uint16_t x1, const uint16_t y1);
+    
+    
+
+
 
     //*Переменные
     CMD actualcmd = CMD::CNT;//?rm
