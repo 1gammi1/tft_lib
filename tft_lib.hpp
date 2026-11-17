@@ -2,7 +2,6 @@
 #define __TFT_LIB__
 
 #include <cstdint>
-#include <endian.h>
 
 enum class DC_MODE_t : uint8_t{
         CMD = 0,
