@@ -3,24 +3,13 @@
 
 #include <cstdint>
 #include <endian.h>
-// #include "stm32f407xx.h"
 
-// struct PIN{
-//     GPIO_TypeDef* port;
-//     uint32_t mask;   
-// };
-
-// struct IOConfig {
-//     SPI_TypeDef* spi;
-//     PIN cs, dc, rst, blk;          // rst, blk: port == nullptr значит «нет»
-//     void (*delayMs)(uint32_t);
-// };
 
 class TFT_ILI9488{
 public:
     // в файле проекта нужно будет "сконструировать объект", передав в конструктор функции конкретных действий 
     //! проверить сигнатуры для tx и rx
-    TFT_ILI9488(uint8_t(*spi_tx_funx)(const uint8_t, const uint8_t*, uint16_t),
+    TFT_ILI9488(uint8_t(*spi_tx_funx)( const uint8_t*, uint16_t),
                 uint8_t(*spi_rx_funx)(const uint8_t, uint8_t*, uint16_t), 
                 void(*select_disp_funx) (const bool), void(*set_led_funx) (const bool),
                 void(*set_DC_funx) (const bool), void(*set_reset_funx) (const bool), 
@@ -70,23 +59,13 @@ private:
         uint8_t par2;
     };
 
-//*Переменные
-    CMD actualcmd = CMD::CNT;//?rm
-    CMD txcmd = CMD::CNT;
+    struct __attribute__((packed)) WindCoordinates{
+        uint16_t x0;
+        uint16_t y0;
+        uint16_t x1;
+        uint16_t y1;
+    };
 
-    uint8_t txbuff[sizeof(TxData_t)] = {0};
-    uint8_t rxbuff[sizeof(uint16_t)] = {0};
-
-    uint32_t ts_ms = 0;
-    uint16_t txsize = 0;
-
-//* сервесные методы
-
-    void setCMD(CMD cmd);
-
-//* КОНСТАНТЫ
-    const uint16_t MAX_COL_ADR = 319;
-    const uint16_t MAX_LINE_ADR = 479;
 static constexpr uint8_t   COMMANDS[uint8_t(CMD::CNT)] = {
         [uint8_t(CMD::RESET_SW)] = 0x01,
         [uint8_t(CMD::SET_PIXEL_FORMAT)] = 0x3A,    // 121 стр
@@ -98,7 +77,7 @@ static constexpr uint8_t   COMMANDS[uint8_t(CMD::CNT)] = {
         [uint8_t(CMD::READ_ID4)] = 0x3D,
         [uint8_t(CMD::READ_DISP_ID)] = 0x04,
     };
-    enum class COLOR_8b : uint8_t{
+    enum class COLOR_3B_t : uint8_t{
         BLACK = 0,
         RED,
         GREEN,
@@ -111,25 +90,28 @@ static constexpr uint8_t   COMMANDS[uint8_t(CMD::CNT)] = {
         CNT
     };
 
-    struct __attribute__((packed)) COLOR_PAC_8B{
+    struct __attribute__((packed)) COLOR_PAC_3B_t{
         uint8_t r :1 = 0;
         uint8_t g :1 = 0;
         uint8_t b :1 = 0;
-    };
-
-    static constexpr COLOR_PAC_8B COLORS_8B_PAR[uint8_t(COLOR_8b::CNT)] = {
-        [uint8_t(COLOR_8b::BLACK)] = {0,0,0},
-        [uint8_t(COLOR_8b::RED)] = {1,0,0},
-        [uint8_t(COLOR_8b::GREEN)] = {0,1,0},
-        [uint8_t(COLOR_8b::BLUE)] = {0,0,1},
-        [uint8_t(COLOR_8b::YELLOW)] = {1,1,0},
-        [uint8_t(COLOR_8b::CYAN)] = {0,1,1},
-        [uint8_t(COLOR_8b::MAGENTA)] = {1,0,1},
-        [uint8_t(COLOR_8b::WHITE)] = {1,1,1},
+        
     };
 
     
-    uint8_t(* const spi_transmit)(const uint8_t addr, const uint8_t* data, 
+
+    static constexpr COLOR_PAC_3B_t COLORS_3B_PAR[uint8_t(COLOR_3B_t::CNT)] = {
+        [uint8_t(COLOR_3B_t::BLACK)] = {0,0,0},
+        [uint8_t(COLOR_3B_t::RED)] = {1,0,0},
+        [uint8_t(COLOR_3B_t::GREEN)] = {0,1,0},
+        [uint8_t(COLOR_3B_t::BLUE)] = {0,0,1},
+        [uint8_t(COLOR_3B_t::YELLOW)] = {1,1,0},
+        [uint8_t(COLOR_3B_t::CYAN)] = {0,1,1},
+        [uint8_t(COLOR_3B_t::MAGENTA)] = {1,0,1},
+        [uint8_t(COLOR_3B_t::WHITE)] = {1,1,1},
+    };
+
+    
+    uint8_t(* const spi_transmit)(const uint8_t* data, 
                                   uint16_t size) = nullptr;
     uint8_t(* const spi_receive)(const uint8_t addr, uint8_t* data, 
                                  uint16_t size) = nullptr;
@@ -139,9 +121,35 @@ static constexpr uint8_t   COMMANDS[uint8_t(CMD::CNT)] = {
     void(* const spi_rst)() = nullptr;  //? хз
     void(* const tft_rst)(const bool state) = nullptr;  //? хз
     void(* const wait)(uint32_t t_ms) = nullptr;
+
+//* КОНСТАНТЫ
+    static constexpr uint16_t MAX_COL_ADR = 319;
+    static constexpr uint16_t MAX_LINE_ADR = 479;
+    static constexpr uint8_t ACTIVE_WIND_WEIGH = 255;
+    static constexpr uint8_t ACTIVE_WIND_HEIGH = 169;
+
+    //* сервисные методы
+    void sendWindow(WindCoordinates coordinate, COLOR_PAC_3B_t (*pixels_buf)[(coordinate.x1 - coordinate.x0) * (coordinate.y1 - coordinate.y0)]);
+    void setCMD(CMD cmd);
+
+    //*Переменные
+    CMD actualcmd = CMD::CNT;//?rm
+    CMD txcmd = CMD::CNT;
+
+    uint8_t txbuff[sizeof(TxData_t)] = {0};
+    uint8_t rxbuff[sizeof(uint16_t)] = {0};
+
+    uint32_t ts_ms = 0;
+    uint16_t txsize = 0;
+
+    COLOR_PAC_3B_t active_window_pixels_buf[UINT8_MAX];
+    
 };
 
+/*Главное, что было придумано:
+    отрисовка происходит по столбцам, в буффер загружаются столбцы поочередно
 
+*/
 
 
 
