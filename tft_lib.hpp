@@ -29,6 +29,17 @@ struct __attribute__((packed)) COLOR_PAC_3B_t{
     
 };
 
+static constexpr COLOR_PAC_3B_t COLORS_3B_PAR[uint8_t(COLOR_3B_t::CNT)] = {
+        [uint8_t(COLOR_3B_t::BLACK)] = {0,0,0},
+        [uint8_t(COLOR_3B_t::RED)] = {1,0,0},
+        [uint8_t(COLOR_3B_t::GREEN)] = {0,1,0},
+        [uint8_t(COLOR_3B_t::BLUE)] = {0,0,1},
+        [uint8_t(COLOR_3B_t::YELLOW)] = {1,1,0},
+        [uint8_t(COLOR_3B_t::CYAN)] = {0,1,1},
+        [uint8_t(COLOR_3B_t::MAGENTA)] = {1,0,1},
+        [uint8_t(COLOR_3B_t::WHITE)] = {1,1,1},
+    };
+
 class TFT_ILI9488{
 public:
     // в файле проекта нужно будет "сконструировать объект", передав в конструктор функции конкретных действий 
@@ -108,19 +119,6 @@ static constexpr uint8_t   COMMANDS[uint8_t(CMD::CNT)] = {
         [uint8_t(CMD::READ_DISP_ID)] = 0x04,
     };
     
-
-    
-
-    static constexpr COLOR_PAC_3B_t COLORS_3B_PAR[uint8_t(COLOR_3B_t::CNT)] = {
-        [uint8_t(COLOR_3B_t::BLACK)] = {0,0,0},
-        [uint8_t(COLOR_3B_t::RED)] = {1,0,0},
-        [uint8_t(COLOR_3B_t::GREEN)] = {0,1,0},
-        [uint8_t(COLOR_3B_t::BLUE)] = {0,0,1},
-        [uint8_t(COLOR_3B_t::YELLOW)] = {1,1,0},
-        [uint8_t(COLOR_3B_t::CYAN)] = {0,1,1},
-        [uint8_t(COLOR_3B_t::MAGENTA)] = {1,0,1},
-        [uint8_t(COLOR_3B_t::WHITE)] = {1,1,1},
-    };
 
     
     uint8_t(* const spi_transmit)(const uint8_t* data, 
