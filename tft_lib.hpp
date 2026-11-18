@@ -23,6 +23,9 @@ enum class COLOR_3B_t : uint8_t{
     };
 
 struct __attribute__((packed)) COLOR_PAC_3B_t{
+    uint8_t r0 :1 = 0;
+    uint8_t g0 :1 = 0;
+    uint8_t b0 :1 = 0;
     uint8_t r :1 = 0;
     uint8_t g :1 = 0;
     uint8_t b :1 = 0;
@@ -30,14 +33,14 @@ struct __attribute__((packed)) COLOR_PAC_3B_t{
 };
 
 static constexpr COLOR_PAC_3B_t COLORS_3B_PAR[uint8_t(COLOR_3B_t::CNT)] = {
-        [uint8_t(COLOR_3B_t::BLACK)] = {0,0,0},
-        [uint8_t(COLOR_3B_t::RED)] = {1,0,0},
-        [uint8_t(COLOR_3B_t::GREEN)] = {0,1,0},
-        [uint8_t(COLOR_3B_t::BLUE)] = {0,0,1},
-        [uint8_t(COLOR_3B_t::YELLOW)] = {1,1,0},
-        [uint8_t(COLOR_3B_t::CYAN)] = {0,1,1},
-        [uint8_t(COLOR_3B_t::MAGENTA)] = {1,0,1},
-        [uint8_t(COLOR_3B_t::WHITE)] = {1,1,1},
+        [uint8_t(COLOR_3B_t::BLACK)] = {0,0,0,0,0,0},
+        [uint8_t(COLOR_3B_t::RED)] = {0,0,0,1,0,0},
+        [uint8_t(COLOR_3B_t::GREEN)] = {0,0,0,0,1,0},
+        [uint8_t(COLOR_3B_t::BLUE)] = {0,0,0,0,0,1},
+        [uint8_t(COLOR_3B_t::YELLOW)] = {0,0,0,1,1,0},
+        [uint8_t(COLOR_3B_t::CYAN)] = {0,0,0,0,1,1},
+        [uint8_t(COLOR_3B_t::MAGENTA)] = {0,0,0,1,0,1},
+        [uint8_t(COLOR_3B_t::WHITE)] = {0,0,0,1,1,1},
     };
 
 class TFT_ILI9488{
