@@ -3,6 +3,11 @@
 
 #include <cstdint>
 
+template <typename T>
+static T* castptr(void* ptr){
+    return static_cast<T*>(static_cast<void*>(ptr));
+}
+
 enum class DC_MODE_t : uint8_t{
         CMD = 0,
         PARAMS,
@@ -109,6 +114,12 @@ private:
         uint16_t x1;
         uint16_t y1;
     };
+
+    struct Prod_ID_t{
+        uint8_t id0 = 0;
+        uint8_t id1 = 0;
+        uint8_t id2 = 0;
+    } ID;
 
 static constexpr uint8_t   COMMANDS[uint8_t(CMD::CNT)] = {
         [uint8_t(CMD::RESET_SW)] = 0x01,

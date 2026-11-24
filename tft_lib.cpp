@@ -75,7 +75,10 @@ void TFT_ILI9488::TFT_Init(){
     // Display ON
     TFT_WriteCommand(0x29);
     wait(20);
-
+    Prod_ID_t* ID_pt = &ID;
+    tft_cs(0);
+    tft_dc(DC_MODE_t::CMD);
+    spi_receive(COMMANDS[uint8_t(CMD::READ_DISP_ID)], castptr<uint8_t>(ID_pt), sizeof(Prod_ID_t));
 }
 
 void TFT_ILI9488::TFT_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1){
