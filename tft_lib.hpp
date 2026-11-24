@@ -179,7 +179,7 @@ static constexpr uint8_t   COMMANDS[uint8_t(CMD::CNT)] = {
     uint32_t ts_ms = 0;
     uint16_t txsize = 0;
 
-    COLOR_PAC_3B_t active_window_pixels_buf[UINT8_MAX];
+    // PIX_PAC_3B_t active_window_pixels_buf[UINT8_MAX];
     
 };
 
