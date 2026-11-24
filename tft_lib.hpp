@@ -42,8 +42,8 @@ static constexpr COLOR_PAC_3B_t COLORS_3B_PAR[uint8_t(COLOR_3B_t::CNT)] = {
         [uint8_t(COLOR_3B_t::RED)] = {0,0,0,1,0,0},
         [uint8_t(COLOR_3B_t::GREEN)] = {0,0,0,0,1,0},
         [uint8_t(COLOR_3B_t::BLUE)] = {0,0,0,0,0,1},
-        [uint8_t(COLOR_3B_t::YELLOW)] = {0,0,0,1,1,0},
-        [uint8_t(COLOR_3B_t::CYAN)] = {0,0,0,0,1,1},
+        [uint8_t(COLOR_3B_t::YELLOW)] = {0,0,0,0,1,1},
+        [uint8_t(COLOR_3B_t::CYAN)] = {0,0,0,1,1,0},
         [uint8_t(COLOR_3B_t::MAGENTA)] = {0,0,0,1,0,1},
         [uint8_t(COLOR_3B_t::WHITE)] = {0,0,0,1,1,1},
     };
