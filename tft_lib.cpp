@@ -21,7 +21,7 @@ void TFT_ILI9488::TFT_WriteData(uint8_t *data, uint16_t size){
 void TFT_ILI9488::TFT_Reset(){
     tft_rst(0);
     wait(20);
-    tft_rst(0);
+    tft_rst(1);
     wait(120);
 }
 
@@ -75,6 +75,7 @@ void TFT_ILI9488::TFT_Init(){
     // Display ON
     TFT_WriteCommand(0x29);
     wait(20);
+
     Prod_ID_t* ID_pt = &ID;
     tft_cs(0);
     tft_dc(DC_MODE_t::CMD);
