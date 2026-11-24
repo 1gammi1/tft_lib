@@ -85,14 +85,14 @@ void TFT_ILI9488::TFT_Init(){
 void TFT_ILI9488::TFT_SetAddressWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1){
     uint8_t data[4];
 
-    TFT_WriteCommand(COMMANDS[uint8_t(CMD::COL_ADR)]);
+    TFT_WriteCommand(COMMANDS[uint8_t(CMD::LINE_ADR)]);
     data[0] = x0 >> 8;
     data[1] = x0 & 0xFF;
     data[2] = x1 >> 8;
     data[3] = x1 & 0xFF;
     TFT_WriteData(data, sizeof(data));
 
-    TFT_WriteCommand(COMMANDS[uint8_t(CMD::LINE_ADR)]);
+    TFT_WriteCommand(COMMANDS[uint8_t(CMD::COL_ADR)]);
     data[0] = y0 >> 8;
     data[1] = y0 & 0xFF;
     data[2] = y1 >> 8;
