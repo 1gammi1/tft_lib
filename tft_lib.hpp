@@ -137,13 +137,13 @@ static constexpr uint8_t   COMMANDS[uint8_t(CMD::CNT)] = {
     
     uint8_t(* const spi_transmit)(const uint8_t* data, 
                                   uint16_t size) = nullptr;
-    uint8_t(* const spi_receive)(const uint8_t addr, uint8_t* data, 
+    uint8_t(* const spi_receive)(const uint8_t cmd, uint8_t* buf, 
                                  uint16_t size) = nullptr;
     void(* const tft_cs)(const bool state) = nullptr;   //0 - выбран, 1 - откл
     void(* const tft_led)(const bool state) = nullptr;  //0-выкл, 1-вкл
     void(* const tft_dc)(const DC_MODE_t state) = nullptr;   //передача 0-команды, 1- параметра или данных
-    void(* const spi_rst)() = nullptr;  //? хз
     void(* const tft_rst)(const bool state) = nullptr;  //? хз
+    void(* const spi_rst)() = nullptr;  //? хз
     void(* const wait)(uint32_t t_ms) = nullptr;
 
 //* КОНСТАНТЫ
