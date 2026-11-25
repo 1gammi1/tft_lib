@@ -91,17 +91,7 @@ public:
 
 
 private:
-    enum class FSM_STATE : uint8_t {
-        INIT = 0,
-        IDLE,
-        TRANSMIT,
-        PROCESS_COMMUNICATE,
-        DISCONNECT,
-
-        CNT
-    };
-
-
+ 
     struct __attribute__((packed)) TxData_t{
         uint8_t cmd;
         uint8_t par1;
